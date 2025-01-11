@@ -1,0 +1,20 @@
+Dataset,File Size (MB),Rows,Columns,Memory Usage (MB)
+Multistore 2019-Oct,5406.01,42448764,9,15743.62
+Multistore 2019-Nov,8589.52,67501979,9,25028.22
+Multistore 2019-Dec,8924.47,67542878,9,25750.2
+Multistore 2020-Jan,7417.67,55967041,9,21379.6
+Multistore 2020-Feb,7319.98,55318565,9,21064.73
+Multistore 2020-Mar,7461.39,56341241,9,21449.76
+Multistore 2020-Apr,8837.92,66589268,9,25390.69
+Electronic transactions,284.81,2633521,8,612.26
+Electronic events,100.86,885129,9,308.0
+Direct messaging campaigns,0.24,1907,19,1.24
+Direct messaging client firt purchase,54.83,1854736,2,132.66
+Direct messaging holidays,0.0,48,2,0.01
+Direct messaging demo,2072.45,10000000,32,14397.0
+Cosmetic 2019-Oct,460.19,4102283,9,1376.67
+Cosmetic 2019-Nov,520.55,4635837,9,1553.63
+Cosmetic 2019-Dec,396.06,3533286,9,1183.49
+Cosmetic 2020-Jan,478.55,4264752,9,1430.18
+Cosmetic 2020-Feb,466.16,4156682,9,1391.53
+Jewelery,12.99,95910,13,38.16

@@ -1,3 +1,5 @@
+# jdszr16-datapaparapa
+
 # marketing_data_app
 App for fast insights from your business and marketing data
 
@@ -6,11 +8,13 @@ App for fast insights from your business and marketing data
     import streamlit as st
     st.write("Hello")
 
+    In our situation, the file is already created: home_page.py
+
 2. Open terminal and set envy where you have installed streamlit pack with commend: conda activate nazwa_srodowiska (you can see all env by commend conda env list).
 
 3. Go to the catalog with file from 1 step by commend: cd /ścieżka/do/folderu 
 
-4. Active file with commend streamlit run nazwa_pliku.py
+4. Active file with commend: streamlit run nazwa_pliku.py
 
 5. After that, it will automatically open web app on your browser.
 
