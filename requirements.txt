@@ -1,0 +1,8 @@
+streamlit
+pandas
+sklearn.feature_extraction.text
+mlxtend.frequent_patterns
+plotly.express
+re
+datetime
+sklearn.neighbors
