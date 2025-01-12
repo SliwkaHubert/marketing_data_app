@@ -1,7 +1,6 @@
 streamlit
 pandas
-sklearn
+scikit-learn
 mlxtend
 plotly
-re
 datetime
