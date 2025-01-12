@@ -5,4 +5,3 @@ mlxtend
 plotly
 re
 datetime
-sklearn.neighbors
