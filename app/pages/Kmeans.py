@@ -76,7 +76,7 @@ if not all(col in df_kmeans.columns for col in required_columns):
     st.stop()
 
 # Ładowanie modelu KMeans
-model_path = '/workspaces/marketing_data_app/models/model_kmeans_cosmetic_05_org.joblib'
+model_path = 'models/model_kmeans_cosmetic_05_org.joblib'
 if not os.path.exists(model_path):
     raise FileNotFoundError(f"Model file not found at {model_path}")
 
