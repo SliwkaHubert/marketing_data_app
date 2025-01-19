@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-st.title("Aplikacja do analizy RFM i więcej")
+st.title("Aplikacja do analizy RFM")
 
 
 # Sprawdzenie, czy plik został wgrany
@@ -44,70 +44,6 @@ filtered_df = df_sales.loc[
 if filtered_df.empty:
     st.warning("⚠️ **Brak danych dla wybranego zakresu dat.**")
     st.stop()
-
-
-total_transactions = filtered_df.shape[0]
-total_revenue = filtered_df['price'].sum()
-average_transaction_value = filtered_df['price'].mean()
-unique_users = filtered_df['user_id'].nunique()
-average_transactions_per_user = total_transactions / unique_users if unique_users else 0
-ltv = total_revenue / unique_users if unique_users else 0
-
-col1, col2, col3 = st.columns(3)
-with col1:
-    st.metric("📦 Całkowita liczba transakcji", total_transactions)
-    st.divider()
-    st.metric("🛒 Średnia liczba zakupów na użytkownika", f"{average_transactions_per_user:.2f}")
-
-with col2:
-    st.metric("💰 Całkowita wartość transakcji", f"${total_revenue:,.2f}")
-    st.divider()
-    st.metric("🔄 Customer Lifetime Value (LTV)", f"${ltv:,.2f}")
-
-with col3:
-    st.metric("💵 Średnia wartość jednej transakcji", f"${average_transaction_value:,.2f}")
-    st.divider()
-    st.metric("👥 Liczba unikalnych użytkowników", unique_users)
-
-
-cart_data = filtered_df[filtered_df['event_type'] == 'purchase']
-
-if not cart_data.empty:
-    cart_data['hour'] = cart_data['event_time'].dt.hour
-    cart_data['day_of_week'] = cart_data['event_time'].dt.day_name()
-    cart_data['month'] = cart_data['event_time'].dt.month_name()
-
-    day_order = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-    cart_data['day_of_week'] = pd.Categorical(cart_data['day_of_week'], categories=day_order, ordered=True)
-
-    month_order = ["January", "February", "March", "April", "May", "June",
-                   "July", "August", "September", "October", "November", "December"]
-    cart_data['month'] = pd.Categorical(cart_data['month'], categories=month_order, ordered=True)
-
-    hourly_revenue = cart_data.groupby('hour')['price'].sum().reset_index()
-    fig_hourly = px.bar(hourly_revenue, x='hour', y='price',
-                        labels={'hour': 'Godzina', 'price': 'Suma wartości zakupów'},
-                        title="⏰ Suma wartości zakupów wg godzin",
-                        color_discrete_sequence=["#636EFA"])
-    st.plotly_chart(fig_hourly)
-
-    daily_revenue = cart_data.groupby('day_of_week')['price'].sum().reset_index()
-    fig_daily = px.bar(daily_revenue, x='day_of_week', y='price',
-                       labels={'day_of_week': 'Dzień tygodnia', 'price': 'Suma wartości zakupów'},
-                       title="📅 Suma wartości zakupów wg dni tygodnia",
-                       color_discrete_sequence=["#EF553B"])
-    st.plotly_chart(fig_daily)
-
-    monthly_revenue = cart_data.groupby('month')['price'].sum().reset_index()
-    monthly_revenue = monthly_revenue.sort_values('month')
-    fig_monthly = px.bar(monthly_revenue, x='month', y='price',
-                         labels={'month': 'Miesiąc', 'price': 'Suma wartości zakupów'},
-                         title="📆 Suma wartości zakupów wg miesięcy",
-                         color_discrete_sequence=["#00CC96"])
-    st.plotly_chart(fig_monthly)
-else:
-    st.info("ℹ️ **Brak danych zakupowych w wybranym zakresie dat.**")
-
 
 def compute_rfm(df_original: pd.DataFrame) -> pd.DataFrame:
     df_rfm = df_original.copy()

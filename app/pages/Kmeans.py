@@ -3,7 +3,6 @@ import joblib
 import matplotlib.pyplot as plt
 import plotly.express as px
 import os
-import pickle
 
 st.title("🔢 Klasteryzacja KMeans")
 
