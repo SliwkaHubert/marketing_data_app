@@ -129,7 +129,7 @@ if st.button("🔍 Przeprowadź analizę koszykową"):
         dense_matrix = create_dense_matrix(analysis_data, selected_column)
 
         # Generowanie reguł asocjacyjnych
-        association_rules_result = generate_association_rules(dense_matrix, min_support=0.002, min_confidence=0.01)
+        association_rules_result = generate_association_rules(dense_matrix, min_support=0.001, min_confidence=0.0001)
 
         if not association_rules_result.empty:
             # Zmiana nazw kolumn i skalowanie
@@ -157,7 +157,7 @@ if 'analysis_done_koszykowa' in st.session_state and st.session_state['analysis_
     association_rules_result = st.session_state['association_rules_result']
 
     # Sekcja wyboru kolumn
-    st.write("### 📋 Wybierz kolumny do wyświetlenia:")
+    st.sidebar.write("### 📋 Wybierz kolumny do wyświetlenia:")
     all_columns = list(COLUMN_MAPPING.values())
 
     # Inicjalizacja session_state dla wybranych kolumn, jeśli nie istnieje
@@ -168,29 +168,37 @@ if 'analysis_done_koszykowa' in st.session_state and st.session_state['analysis_
     def reset_columns_koszykowa():
         st.session_state['selected_columns_koszykowa'] = all_columns.copy()
 
-    # Przycisk resetujący wybór kolumn
-    st.button("🔄 Przywróć wszystkie kolumny", on_click=reset_columns_koszykowa)
 
-    # Multiselect dla wyboru kolumn, z wartością domyślną z session_state
-    selected_columns = st.multiselect(
-        "🗂️ Wybierz kolumny:",
-        options=all_columns,
-        default=st.session_state['selected_columns_koszykowa'],
-        key='multiselect_columns_koszykowa'
-    )
+    with st.sidebar.expander("📋 Wybierz kolumny do wyświetlenia", expanded=False):
+        all_columns = list(COLUMN_MAPPING.values())
+
+        # Inicjalizacja session_state dla wybranych kolumn, jeśli nie istnieje
+        if 'selected_columns_koszykowa' not in st.session_state:
+            st.session_state['selected_columns_koszykowa'] = all_columns.copy()
+
+        selected_columns = []
+        for col in all_columns:
+            if st.checkbox(col, value=col in st.session_state['selected_columns_koszykowa']):
+                selected_columns.append(col)
+
+        # Aktualizacja session_state z wybranymi kolumnami
+        if selected_columns:
+            st.session_state['selected_columns_koszykowa'] = selected_columns
+
+
 
     # Aktualizacja session_state z wybranymi kolumnami
     if selected_columns:
         st.session_state['selected_columns_koszykowa'] = selected_columns
 
         # Dodanie sekcji filtrów na głównej stronie
-        st.header("🔍 Filtry poszczególnych wartości kolumn")
+        st.sidebar.header("🔍 Filtry poszczególnych wartości kolumn")
 
         # Inicjalizacja domyślnych filtrów
         initialize_filters(association_rules_result)
 
         # Suwak dla Popularność produktów bazowych
-        antecedent_support_range = st.slider(
+        antecedent_support_range = st.sidebar.slider(
             "Popularność produktów bazowych (%)",
             min_value=0.0,
             max_value=100.0,
@@ -200,7 +208,7 @@ if 'analysis_done_koszykowa' in st.session_state and st.session_state['analysis_
         st.session_state['current_filters']['antecedent_support'] = antecedent_support_range
 
         # Suwak dla Popularność produktów rekomendowanych
-        consequent_support_range = st.slider(
+        consequent_support_range = st.sidebar.slider(
             "Popularność produktów rekomendowanych (%)",
             min_value=0.0,
             max_value=100.0,
@@ -210,7 +218,7 @@ if 'analysis_done_koszykowa' in st.session_state and st.session_state['analysis_
         st.session_state['current_filters']['consequent_support'] = consequent_support_range
 
         # Suwak dla Wsparcie reguły
-        support_range = st.slider(
+        support_range = st.sidebar.slider(
             "Wsparcie reguły (%)",
             min_value=0.0,
             max_value=100.0,
@@ -220,7 +228,7 @@ if 'analysis_done_koszykowa' in st.session_state and st.session_state['analysis_
         st.session_state['current_filters']['support'] = support_range
 
         # Suwak dla Pewność reguły
-        confidence_range = st.slider(
+        confidence_range = st.sidebar.slider(
             "Pewność reguły (%)",
             min_value=0.0,
             max_value=100.0,
@@ -230,7 +238,7 @@ if 'analysis_done_koszykowa' in st.session_state and st.session_state['analysis_
         st.session_state['current_filters']['confidence'] = confidence_range
 
         # Suwak dla Wzrost sprzedaży
-        lift_range = st.slider(
+        lift_range = st.sidebar.slider(
             "Wzrost sprzedaży",
             min_value=0.0,
             max_value=association_rules_result["Wzrost sprzedaży"].max(),
@@ -240,7 +248,7 @@ if 'analysis_done_koszykowa' in st.session_state and st.session_state['analysis_
         st.session_state['current_filters']['lift'] = lift_range
 
         # Przycisk do resetowania filtrów do domyślnych wartości
-        st.button("🔄 Przywróć domyślne filtry", on_click=reset_filters)
+        st.sidebar.button("🔄 Przywróć domyślne filtry", on_click=reset_filters)
 
         # Filtracja danych na podstawie suwaków
         filtered_rules = association_rules_result[
@@ -279,7 +287,7 @@ if 'analysis_done_koszykowa' in st.session_state and st.session_state['analysis_
             mime='text/csv'
         )
 
-        st.write(f"Liczba reguł po filtracji: {filtered_rules.shape[0]}")
+
 
     else:
         st.warning("⚠️ Wybierz przynajmniej jedną kolumnę do wyświetlenia.")
