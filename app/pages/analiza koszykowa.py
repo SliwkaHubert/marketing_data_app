@@ -129,7 +129,8 @@ if st.button("🔍 Przeprowadź analizę koszykową"):
         dense_matrix = create_dense_matrix(analysis_data, selected_column)
 
         # Generowanie reguł asocjacyjnych
-        association_rules_result = generate_association_rules(dense_matrix, min_support=0.001, min_confidence=0.0001)
+        association_rules_result = generate_association_rules(dense_matrix, min_support=0.002, min_confidence=0.01)
+        # association_rules_result = generate_association_rules(dense_matrix, min_support=0.0001, min_confidence=0.0001)
 
         if not association_rules_result.empty:
             # Zmiana nazw kolumn i skalowanie
