@@ -73,18 +73,73 @@ def visualize_clusters_3d_dynamic(data, labels, color_map, segment_labels):
     except Exception as e:
         st.error(f"Błąd podczas dynamicznej wizualizacji klastrów 3D: {e}")
 
-def summarize_clusters(data, labels, segment_labels):
+def summarize_clusters(data, labels_series, segment_labels):
     try:
-        data['Segment'] = labels
-        data['Segment Name'] = labels.map(segment_labels)
+        # Dodanie kolumny z nazwami segmentów
+        data['Segment'] = labels_series
+        data['Segment Name'] = labels_series.map(segment_labels)
+
+        # Podsumowanie danych w klastrach
         summary = data.groupby('Segment Name').agg(
             recency_mean=('recency', 'mean'),
+            recency_std=('recency', 'std'),
             frequency_mean=('frequency', 'mean'),
+            frequency_std=('frequency', 'std'),
             monetary_mean=('monetary', 'mean'),
+            monetary_std=('monetary', 'std'),
+            total_revenue=('monetary', 'sum'),
             user_count=('Segment', 'count')
         ).reset_index()
-        st.subheader("Podsumowanie klastrów")
+
+        # Dodanie procentowego udziału klastrów
+        total_users = data['Segment'].count()
+        total_revenue = data['monetary'].sum()
+        summary['user_percentage'] = (summary['user_count'] / total_users) * 100
+        summary['revenue_percentage'] = (summary['total_revenue'] / total_revenue) * 100
+
+        # Wyświetlenie tabeli z podsumowaniem
+        st.subheader("📊 Podsumowanie klastrów")
         st.dataframe(summary)
+
+        # Wizualizacja udziału klientów w klastrach
+        st.subheader("🧩 Procentowy udział klientów w klastrach")
+        fig_users = px.pie(
+            summary,
+            names='Segment Name',
+            values='user_percentage',
+            title="Procentowy udział klientów w klastrach",
+            color='Segment Name',
+            color_discrete_map={
+                "Champions": "green",
+                "Loyal Customers": "blue",
+                "At Risk": "orange",
+                "Lost Customers": "red",
+                "New Customers": "purple"
+            }
+        )
+        st.plotly_chart(fig_users)
+
+        # Wizualizacja udziału przychodów w klastrach
+        st.subheader("💰 Udział przychodów w klastrach")
+        fig_revenue = px.bar(
+            summary,
+            x='Segment Name',
+            y='revenue_percentage',
+            text='revenue_percentage',
+            title="Procentowy udział przychodów w klastrach",
+            labels={'revenue_percentage': 'Procent przychodów (%)'},
+            color='Segment Name',
+            color_discrete_map={
+                "Champions": "green",
+                "Loyal Customers": "blue",
+                "At Risk": "orange",
+                "Lost Customers": "red",
+                "New Customers": "purple"
+            }
+        )
+        fig_revenue.update_traces(texttemplate='%{text:.2f}%', textposition='outside')
+        st.plotly_chart(fig_revenue)
+
         return summary
     except Exception as e:
         st.error(f"Błąd podczas podsumowania klastrów: {e}")
