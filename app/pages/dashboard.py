@@ -29,65 +29,6 @@ def calculate_ltv(df):
     ).reset_index()
     return ltv_df
 
-# Funkcja do obliczania RFM
-def calculate_rfm(df, reference_date):
-    rfm_df = df.groupby('user_id').agg({
-        'event_time': lambda x: (reference_date - x.max()).days,
-        'user_id': 'count',
-        'price': 'sum'
-    }).rename(columns={
-        'event_time': 'Recency',
-        'user_id': 'Frequency',
-        'price': 'Monetary'
-    }).reset_index()
-    return rfm_df
-
-# Funkcja do segmentacji RFM
-def rfm_segment(rfm):
-    segments = []
-    for _, row in rfm.iterrows():
-        score = ''
-        # Recency
-        if row['Recency'] <= 30:
-            score += '4'
-        elif row['Recency'] <= 60:
-            score += '3'
-        elif row['Recency'] <= 90:
-            score += '2'
-        else:
-            score += '1'
-        # Frequency
-        if row['Frequency'] >= 10:
-            score += '4'
-        elif row['Frequency'] >= 7:
-            score += '3'
-        elif row['Frequency'] >= 4:
-            score += '2'
-        else:
-            score += '1'
-        # Monetary
-        if row['Monetary'] >= 1000:
-            score += '4'
-        elif row['Monetary'] >= 500:
-            score += '3'
-        elif row['Monetary'] >= 200:
-            score += '2'
-        else:
-            score += '1'
-        # Segmentacja na podstawie RFM Score
-        if score == '444':
-            segments.append('Champion')
-        elif score.startswith('4') and score.endswith('3'):
-            segments.append('Loyal Customer')
-        elif score.startswith('3') and score.endswith('2'):
-            segments.append('Potential Loyalist')
-        elif score.startswith('2') and score.endswith('1'):
-            segments.append('At Risk')
-        else:
-            segments.append('Others')
-    rfm['Segment'] = segments
-    return rfm
-
 # Konfiguracja strony
 st.set_page_config(page_title="📊 Dashboard - Analiza Danych", layout="wide")
 st.title("📈 Dashboard - Analiza Danych")
@@ -139,7 +80,7 @@ else:
         col1, col2, col3 = st.columns(3)
 
         with col1:
-            st.metric("📦 Całkowita liczba transakcji", total_transactions)
+            st.metric("📦 Całkowita liczba transakcji", f"${total_transactions:,.2f}")
             st.divider()
             st.metric("🛒 Średnia liczba zakupów na użytkownika", f"{average_transactions_per_user:.2f}")
 
@@ -151,7 +92,8 @@ else:
         with col3:
             st.metric("💵 Średnia wartość jednej transakcji", f"${average_transaction_value:,.2f}")
             st.divider()
-            st.metric("👥 Liczba unikalnych użytkowników", unique_users)
+            formatted_number= " ".join([str(unique_users)[::-1][i:i+3] for i in range(0,len(str(unique_users)), 3)])[::-1]
+            st.metric("👥 Liczba unikalnych użytkowników", formatted_number) 
 
         # Analiza zakupów wg godzin, dni tygodnia i miesięcy
         cart_data = filtered_df[filtered_df['event_type'] == 'purchase']
@@ -210,9 +152,13 @@ else:
         total_ltv = ltv_df['LTV'].sum()
         average_ltv = ltv_df['LTV'].mean()
         median_ltv = ltv_df['LTV'].median()
-        st.metric("💎 Całkowity LTV wszystkich klientów", f"${total_ltv:,.2f}")
-        st.metric("📈 Średni LTV na klienta", f"${average_ltv:,.2f}")
-        st.metric("📊 Mediana LTV", f"${median_ltv:,.2f}")
+        col4, col5, col6 = st.columns(3)
+        with col4:
+            st.metric("💎 Całkowity LTV wszystkich klientów", f"${total_ltv:,.2f}")
+        with col5: 
+            st.metric("📈 Średni LTV na klienta", f"${average_ltv:,.2f}")
+        with col6: 
+            st.metric("📊 Mediana LTV", f"${median_ltv:,.2f}")
 
         # Wizualizacja rozkładu LTV
         st.subheader("📉 Rozkład LTV klientów")
